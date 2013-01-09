@@ -14,7 +14,7 @@
  */
 (function( $, undefined ) {
 
-var lastActive, startXPos, startYPos, clickDragged,
+var lastActive, startXPos, startYPos, clickDragged, startClickTime
 	baseClasses = "ui-button ui-widget ui-state-default ui-corner-all",
 	stateClasses = "ui-state-hover ui-state-active ",
 	typeClasses = "ui-button-icons-only ui-button-icon-only ui-button-text-icons ui-button-text-icon-primary ui-button-text-icon-secondary ui-button-text-only",
@@ -120,9 +120,11 @@ $.widget( "ui.button", {
 				}
 				that.refresh();
 			});
-			// if mouse moves between mousedown and mouseup (drag) set clickDragged flag
+			// if a long mouse click (>140ms) moves  between mousedown and mouseup (drag) set clickDragged flag
 			// prevents issue where button state changes but checkbox/radio checked state
 			// does not in Firefox (see ticket #6970)
+			
+			
 			this.buttonElement
 				.bind( "mousedown" + this.eventNamespace, function( event ) {
 					if ( options.disabled ) {
@@ -131,13 +133,16 @@ $.widget( "ui.button", {
 					clickDragged = false;
 					startXPos = event.pageX;
 					startYPos = event.pageY;
+					startClickTime = new Date();
 				})
 				.bind( "mouseup" + this.eventNamespace, function( event ) {
 					if ( options.disabled ) {
 						return;
 					}
 					if ( startXPos !== event.pageX || startYPos !== event.pageY ) {
-						clickDragged = true;
+						if((new Date() - startClickTime ) > 140){
+							clickDragged = true;
+						}
 					}
 			});
 		}
